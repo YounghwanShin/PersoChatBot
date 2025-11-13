@@ -1,0 +1,94 @@
+"""
+Chat API router.
+
+This module defines the chat endpoints for the FastAPI application.
+"""
+
+from fastapi import APIRouter, HTTPException, Depends
+from typing import Dict
+from ..models.schemas import ChatRequest, ChatResponse, RetrievedChunk
+from ..services.rag_service import RAGService
+from ..dependencies import get_rag_service
+
+router = APIRouter(prefix="/chat", tags=["chat"])
+
+
+@router.post("/", response_model=ChatResponse)
+async def chat(
+    request: ChatRequest,
+    rag_service: RAGService = Depends(get_rag_service)
+) -> ChatResponse:
+    """
+    Chat endpoint for question answering.
+    
+    Args:
+        request: ChatRequest containing user message and conversation history
+        rag_service: Injected RAG service
+        
+    Returns:
+        ChatResponse with answer and retrieved context
+    """
+    try:
+        # Convert conversation history to dict format
+        conversation_history = [
+            {"role": msg.role, "content": msg.content}
+            for msg in request.conversation_history
+        ]
+        
+        # Get response from RAG service
+        result = rag_service.chat(
+            query=request.message,
+            conversation_history=conversation_history,
+            top_k=3,
+            score_threshold=0.3
+        )
+        
+        # Format response
+        retrieved_chunks = [
+            RetrievedChunk(
+                content=chunk["content"],
+                score=chunk["score"],
+                metadata=chunk["metadata"]
+            )
+            for chunk in result["retrieved_chunks"]
+        ]
+        
+        response = ChatResponse(
+            answer=result["answer"],
+            retrieved_chunks=retrieved_chunks,
+            confidence=result["confidence"]
+        )
+        
+        return response
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error processing chat request: {str(e)}"
+        )
+
+
+@router.get("/health")
+async def health_check(
+    rag_service: RAGService = Depends(get_rag_service)
+) -> Dict:
+    """
+    Health check endpoint for chat service.
+    
+    Returns:
+        Dictionary with service status
+    """
+    try:
+        # Check vector store connection
+        is_healthy = rag_service.vector_store.health_check()
+        
+        return {
+            "status": "healthy" if is_healthy else "degraded",
+            "vector_store": "connected" if is_healthy else "disconnected"
+        }
+        
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "error": str(e)
+        }

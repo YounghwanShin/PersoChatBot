@@ -1,0 +1,162 @@
+"""
+Data preprocessing and indexing script.
+
+This script preprocesses the Q&A Excel file and indexes it into Qdrant.
+Run this script before starting the API server.
+"""
+
+import sys
+import os
+
+# Add parent directory to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from app.config import settings
+from app.services.preprocessing import PreprocessingService
+from app.services.embedding import create_embedding_service
+from app.services.vector_store import VectorStoreService
+
+
+def main():
+    """Main preprocessing and indexing function."""
+    print("=" * 60)
+    print("Perso.ai Chatbot - Data Preprocessing & Indexing")
+    print("=" * 60)
+    
+    # Step 1: Load and preprocess data
+    print("\n[Step 1] Loading Q&A data...")
+    preprocessor = PreprocessingService(settings.data_file)
+    
+    try:
+        chunks = preprocessor.create_chunks()
+        print(f"✓ Created {len(chunks)} chunks from data")
+        
+        # Validate chunks
+        if not preprocessor.validate_chunks(chunks):
+            print("✗ Chunk validation failed")
+            return
+        print("✓ Chunk validation passed")
+        
+    except Exception as e:
+        print(f"✗ Error preprocessing data: {e}")
+        return
+    
+    # Step 2: Initialize embedding service
+    print("\n[Step 2] Initializing embedding service...")
+    try:
+        embedding_service = create_embedding_service(
+            model_type="sentence-transformers",
+            model_name=settings.embedding_model
+        )
+        print(f"✓ Loaded embedding model: {settings.embedding_model}")
+        print(f"✓ Embedding dimension: {embedding_service.get_dimension()}")
+        
+    except Exception as e:
+        print(f"✗ Error loading embedding model: {e}")
+        return
+    
+    # Step 3: Generate embeddings
+    print("\n[Step 3] Generating embeddings...")
+    try:
+        # Extract content for embedding
+        contents = [chunk["content"] for chunk in chunks]
+        
+        embeddings = embedding_service.embed_texts(contents)
+        print(f"✓ Generated {len(embeddings)} embeddings")
+        print(f"✓ Embedding shape: {embeddings.shape}")
+        
+    except Exception as e:
+        print(f"✗ Error generating embeddings: {e}")
+        return
+    
+    # Step 4: Initialize Qdrant
+    print("\n[Step 4] Connecting to Qdrant...")
+    try:
+        vector_store = VectorStoreService(
+            host=settings.qdrant_host,
+            port=settings.qdrant_port,
+            collection_name=settings.qdrant_collection_name,
+            embedding_dimension=settings.embedding_dimension,
+            api_key=settings.qdrant_api_key
+        )
+        
+        if not vector_store.health_check():
+            print("✗ Cannot connect to Qdrant")
+            print("  Make sure Qdrant is running:")
+            print("  docker run -p 6333:6333 qdrant/qdrant")
+            return
+        
+        print(f"✓ Connected to Qdrant at {settings.qdrant_host}:{settings.qdrant_port}")
+        
+    except Exception as e:
+        print(f"✗ Error connecting to Qdrant: {e}")
+        return
+    
+    # Step 5: Create collection
+    print("\n[Step 5] Creating Qdrant collection...")
+    try:
+        # Ask user if they want to recreate collection
+        response = input(f"Collection '{settings.qdrant_collection_name}' will be created/recreated. Continue? (y/n): ")
+        if response.lower() != 'y':
+            print("Aborted by user")
+            return
+        
+        vector_store.create_collection(recreate=True)
+        print(f"✓ Created collection: {settings.qdrant_collection_name}")
+        
+    except Exception as e:
+        print(f"✗ Error creating collection: {e}")
+        return
+    
+    # Step 6: Index documents
+    print("\n[Step 6] Indexing documents...")
+    try:
+        success = vector_store.index_documents(embeddings, chunks)
+        
+        if success:
+            print(f"✓ Successfully indexed {len(chunks)} documents")
+            
+            # Display collection info
+            info = vector_store.get_collection_info()
+            print(f"\nCollection Information:")
+            print(f"  Name: {info.get('name')}")
+            print(f"  Points: {info.get('points_count')}")
+            print(f"  Vectors: {info.get('vectors_count')}")
+            print(f"  Status: {info.get('status')}")
+        else:
+            print("✗ Indexing failed")
+            return
+            
+    except Exception as e:
+        print(f"✗ Error indexing documents: {e}")
+        return
+    
+    # Step 7: Test search
+    print("\n[Step 7] Testing search...")
+    try:
+        test_query = "Perso.ai는 무엇인가요?"
+        print(f"Test query: {test_query}")
+        
+        query_embedding = embedding_service.embed_single(test_query)
+        results = vector_store.search(query_embedding, top_k=3)
+        
+        print(f"\n✓ Found {len(results)} results:")
+        for i, result in enumerate(results, 1):
+            print(f"\n  Result {i}:")
+            print(f"    Score: {result['score']:.3f}")
+            print(f"    Question: {result['question'][:50]}...")
+            print(f"    Answer: {result['answer'][:80]}...")
+            
+    except Exception as e:
+        print(f"✗ Error testing search: {e}")
+        return
+    
+    print("\n" + "=" * 60)
+    print("✓ Preprocessing and indexing completed successfully!")
+    print("=" * 60)
+    print("\nYou can now start the API server:")
+    print("  uvicorn app.main:app --reload")
+
+
+if __name__ == "__main__":
+    main()
