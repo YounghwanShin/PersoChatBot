@@ -1,8 +1,4 @@
-"""
-FastAPI main application.
-
-This is the entry point for the Perso.ai chatbot backend API.
-"""
+"""FastAPI main application."""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,14 +7,12 @@ from .routers import chat
 from .models.schemas import HealthResponse
 from .dependencies import get_vector_store
 
-# Create FastAPI app
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
-    description="벡터 데이터베이스를 활용한 Perso.ai 지식 챗봇 API"
+    description="Vector database-based Perso.ai knowledge chatbot API"
 )
 
-# Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -27,7 +21,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
 app.include_router(chat.router, prefix=settings.api_prefix)
 
 
@@ -43,12 +36,7 @@ async def root():
 
 @app.get(f"{settings.api_prefix}/health", response_model=HealthResponse)
 async def health_check():
-    """
-    Health check endpoint.
-    
-    Returns:
-        HealthResponse with service status
-    """
+    """Health check endpoint."""
     try:
         vector_store = get_vector_store()
         qdrant_connected = vector_store.health_check()
@@ -58,7 +46,7 @@ async def health_check():
             version=settings.app_version,
             qdrant_connected=qdrant_connected
         )
-    except Exception as e:
+    except Exception:
         return HealthResponse(
             status="unhealthy",
             version=settings.app_version,
@@ -73,18 +61,17 @@ async def startup_event():
     print(f"Qdrant: {settings.qdrant_host}:{settings.qdrant_port}")
     print(f"Collection: {settings.qdrant_collection_name}")
     
-    # Verify Qdrant connection
     try:
         vector_store = get_vector_store()
         if vector_store.health_check():
-            print("✓ Qdrant connection successful")
+            print("Qdrant connection successful")
             info = vector_store.get_collection_info()
             if info:
-                print(f"✓ Collection info: {info}")
+                print(f"Collection info: {info}")
         else:
-            print("✗ Qdrant connection failed")
+            print("Qdrant connection failed")
     except Exception as e:
-        print(f"✗ Error connecting to Qdrant: {e}")
+        print(f"Error connecting to Qdrant: {e}")
 
 
 @app.on_event("shutdown")

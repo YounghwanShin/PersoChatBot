@@ -1,8 +1,4 @@
-"""
-Dependency injection for FastAPI.
-
-This module provides singleton services that are injected into route handlers.
-"""
+"""Dependency injection for FastAPI."""
 
 from functools import lru_cache
 from .config import settings

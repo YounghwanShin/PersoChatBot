@@ -1,9 +1,4 @@
-/**
- * Chat interface component.
- * 
- * This component provides a ChatGPT-style interface for
- * interacting with the Perso.ai knowledge chatbot.
- */
+"""Chat interface component."""
 
 'use client';
 
@@ -24,18 +19,15 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Handle sending a message
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!inputMessage.trim() || isLoading) return;
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -48,18 +40,15 @@ export default function ChatInterface() {
     setIsLoading(true);
 
     try {
-      // Get conversation history (last 5 messages)
       const conversationHistory: ChatMessage[] = messages
         .slice(-5)
         .map(msg => ({ role: msg.role, content: msg.content }));
 
-      // Send to API
       const response = await apiClient.sendMessage(
         inputMessage,
         conversationHistory
       );
 
-      // Add assistant message
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -73,7 +62,6 @@ export default function ChatInterface() {
     } catch (error) {
       console.error('Error:', error);
       
-      // Add error message
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -87,7 +75,6 @@ export default function ChatInterface() {
     }
   };
 
-  // Sample questions
   const sampleQuestions = [
     'Perso.ai는 어떤 서비스인가요?',
     'Perso.ai의 주요 기능은 무엇인가요?',
@@ -97,7 +84,6 @@ export default function ChatInterface() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <h1 className="text-2xl font-bold text-gray-900">
           Perso.ai 지식 챗봇
@@ -107,20 +93,18 @@ export default function ChatInterface() {
         </p>
       </div>
 
-      {/* Messages Container */}
       <div className="flex-1 overflow-y-auto px-6 py-8">
         <div className="max-w-3xl mx-auto space-y-6">
           {messages.length === 0 && (
             <div className="text-center py-12">
               <Bot className="w-16 h-16 mx-auto text-primary-500 mb-4" />
               <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                안녕하세요! 👋
+                안녕하세요!
               </h2>
               <p className="text-gray-600 mb-8">
                 Perso.ai에 대해 궁금한 것을 물어보세요
               </p>
               
-              {/* Sample Questions */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
                 {sampleQuestions.map((question, idx) => (
                   <button
@@ -191,7 +175,6 @@ export default function ChatInterface() {
         </div>
       </div>
 
-      {/* Input Area */}
       <div className="border-t border-gray-200 bg-white px-6 py-4">
         <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto">
           <div className="flex gap-3">

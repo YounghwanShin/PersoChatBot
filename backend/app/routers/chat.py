@@ -1,8 +1,4 @@
-"""
-Chat API router.
-
-This module defines the chat endpoints for the FastAPI application.
-"""
+"""Chat API router."""
 
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict
@@ -18,24 +14,13 @@ async def chat(
     request: ChatRequest,
     rag_service: RAGService = Depends(get_rag_service)
 ) -> ChatResponse:
-    """
-    Chat endpoint for question answering.
-    
-    Args:
-        request: ChatRequest containing user message and conversation history
-        rag_service: Injected RAG service
-        
-    Returns:
-        ChatResponse with answer and retrieved context
-    """
+    """Chat endpoint for question answering."""
     try:
-        # Convert conversation history to dict format
         conversation_history = [
             {"role": msg.role, "content": msg.content}
             for msg in request.conversation_history
         ]
         
-        # Get response from RAG service
         result = rag_service.chat(
             query=request.message,
             conversation_history=conversation_history,
@@ -43,7 +28,6 @@ async def chat(
             score_threshold=0.3
         )
         
-        # Format response
         retrieved_chunks = [
             RetrievedChunk(
                 content=chunk["content"],
@@ -72,14 +56,8 @@ async def chat(
 async def health_check(
     rag_service: RAGService = Depends(get_rag_service)
 ) -> Dict:
-    """
-    Health check endpoint for chat service.
-    
-    Returns:
-        Dictionary with service status
-    """
+    """Health check endpoint for chat service."""
     try:
-        # Check vector store connection
         is_healthy = rag_service.vector_store.health_check()
         
         return {

@@ -1,9 +1,4 @@
-"""
-Pydantic models for request/response validation.
-
-This module defines all data models used in the API for type safety
-and automatic validation.
-"""
+"""Pydantic models for request/response validation."""
 
 from pydantic import BaseModel, Field
 from typing import List, Optional

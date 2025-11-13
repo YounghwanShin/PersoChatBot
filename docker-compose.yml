@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # Qdrant Vector Database
   qdrant:
     image: qdrant/qdrant:latest
     ports:
@@ -14,7 +13,6 @@ services:
     networks:
       - perso-ai-network
 
-  # Backend API
   backend:
     build:
       context: ./backend
@@ -34,7 +32,6 @@ services:
       - ./backend:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-  # Frontend
   frontend:
     build:
       context: ./frontend

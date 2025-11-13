@@ -1,8 +1,4 @@
-/**
- * Root layout for the application.
- * 
- * This layout wraps all pages and provides global styles.
- */
+"""Root layout for the application."""
 
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';

@@ -1,20 +1,12 @@
-"""
-Vector store service using Qdrant.
+"""Vector store service using Qdrant."""
 
-This module handles all interactions with the Qdrant vector database
-including indexing and searching.
-"""
-
-from typing import List, Dict, Tuple
+from typing import List, Dict
 import numpy as np
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance,
     VectorParams,
     PointStruct,
-    Filter,
-    FieldCondition,
-    MatchValue
 )
 
 
@@ -29,39 +21,19 @@ class VectorStoreService:
         embedding_dimension: int,
         api_key: str = None
     ):
-        """
-        Initialize Qdrant vector store service.
-        
-        Args:
-            host: Qdrant server host
-            port: Qdrant server port
-            collection_name: Name of the collection to use
-            embedding_dimension: Dimension of embedding vectors
-            api_key: Optional API key for Qdrant Cloud
-        """
         self.host = host
         self.port = port
         self.collection_name = collection_name
         self.embedding_dimension = embedding_dimension
         
-        # Initialize Qdrant client
         if api_key:
             self.client = QdrantClient(url=f"https://{host}", api_key=api_key)
         else:
             self.client = QdrantClient(host=host, port=port)
     
     def create_collection(self, recreate: bool = False) -> bool:
-        """
-        Create a new collection in Qdrant.
-        
-        Args:
-            recreate: If True, delete existing collection and create new one
-            
-        Returns:
-            True if collection created successfully
-        """
+        """Create a new collection in Qdrant."""
         try:
-            # Check if collection exists
             collections = self.client.get_collections().collections
             collection_names = [col.name for col in collections]
             
@@ -72,7 +44,6 @@ class VectorStoreService:
                     print(f"Collection '{self.collection_name}' already exists")
                     return True
             
-            # Create collection
             self.client.create_collection(
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(
@@ -93,16 +64,7 @@ class VectorStoreService:
         embeddings: np.ndarray,
         chunks: List[Dict[str, any]]
     ) -> bool:
-        """
-        Index documents into Qdrant collection.
-        
-        Args:
-            embeddings: NumPy array of embeddings (n_docs, embedding_dim)
-            chunks: List of chunk dictionaries with metadata
-            
-        Returns:
-            True if indexing successful
-        """
+        """Index documents into Qdrant collection."""
         try:
             points = []
             
@@ -120,7 +82,6 @@ class VectorStoreService:
                 )
                 points.append(point)
             
-            # Upload points in batches
             batch_size = 100
             for i in range(0, len(points), batch_size):
                 batch = points[i:i + batch_size]
@@ -142,17 +103,7 @@ class VectorStoreService:
         top_k: int = 5,
         score_threshold: float = 0.0
     ) -> List[Dict[str, any]]:
-        """
-        Search for similar documents.
-        
-        Args:
-            query_embedding: Query embedding vector
-            top_k: Number of top results to return
-            score_threshold: Minimum similarity score threshold
-            
-        Returns:
-            List of search results with scores and metadata
-        """
+        """Search for similar documents."""
         try:
             search_result = self.client.search(
                 collection_name=self.collection_name,
@@ -180,12 +131,7 @@ class VectorStoreService:
             return []
     
     def get_collection_info(self) -> Dict[str, any]:
-        """
-        Get information about the collection.
-        
-        Returns:
-            Dictionary with collection information
-        """
+        """Get information about the collection."""
         try:
             info = self.client.get_collection(self.collection_name)
             return {
@@ -199,12 +145,7 @@ class VectorStoreService:
             return {}
     
     def health_check(self) -> bool:
-        """
-        Check if Qdrant server is accessible.
-        
-        Returns:
-            True if server is accessible
-        """
+        """Check if Qdrant server is accessible."""
         try:
             self.client.get_collections()
             return True

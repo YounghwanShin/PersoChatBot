@@ -1,9 +1,4 @@
-"""
-Embedding service with pluggable architecture.
-
-This module provides a modular embedding system that allows
-easy switching between different embedding models.
-"""
+"""Embedding service with pluggable architecture."""
 
 from abc import ABC, abstractmethod
 from typing import List
@@ -16,25 +11,12 @@ class EmbeddingModel(ABC):
     
     @abstractmethod
     def encode(self, texts: List[str]) -> np.ndarray:
-        """
-        Encode texts into embeddings.
-        
-        Args:
-            texts: List of text strings to encode
-            
-        Returns:
-            NumPy array of embeddings
-        """
+        """Encode texts into embeddings."""
         pass
     
     @abstractmethod
     def get_dimension(self) -> int:
-        """
-        Get the dimension of embeddings.
-        
-        Returns:
-            Embedding dimension
-        """
+        """Get the dimension of embeddings."""
         pass
 
 
@@ -42,26 +24,12 @@ class SentenceTransformerEmbedding(EmbeddingModel):
     """Sentence-Transformers based embedding model."""
     
     def __init__(self, model_name: str):
-        """
-        Initialize Sentence-Transformers model.
-        
-        Args:
-            model_name: Name of the model from Hugging Face
-        """
         self.model_name = model_name
         self.model = SentenceTransformer(model_name)
         self._dimension = self.model.get_sentence_embedding_dimension()
     
     def encode(self, texts: List[str]) -> np.ndarray:
-        """
-        Encode texts using Sentence-Transformers.
-        
-        Args:
-            texts: List of text strings to encode
-            
-        Returns:
-            NumPy array of embeddings
-        """
+        """Encode texts using Sentence-Transformers."""
         embeddings = self.model.encode(
             texts,
             show_progress_bar=False,
@@ -75,25 +43,12 @@ class SentenceTransformerEmbedding(EmbeddingModel):
 
 
 class OpenAIEmbedding(EmbeddingModel):
-    """
-    OpenAI embedding model (placeholder for future implementation).
-    
-    To use OpenAI embeddings, implement this class with:
-    - openai.Embedding.create() API calls
-    - Proper API key handling
-    """
+    """OpenAI embedding model (placeholder for future implementation)."""
     
     def __init__(self, api_key: str, model_name: str = "text-embedding-ada-002"):
-        """
-        Initialize OpenAI embedding model.
-        
-        Args:
-            api_key: OpenAI API key
-            model_name: Name of the OpenAI embedding model
-        """
         self.api_key = api_key
         self.model_name = model_name
-        self._dimension = 1536  # ada-002 dimension
+        self._dimension = 1536
     
     def encode(self, texts: List[str]) -> np.ndarray:
         """Encode texts using OpenAI API."""
@@ -108,36 +63,14 @@ class EmbeddingService:
     """Service for managing embedding operations."""
     
     def __init__(self, model: EmbeddingModel):
-        """
-        Initialize embedding service.
-        
-        Args:
-            model: An instance of EmbeddingModel
-        """
         self.model = model
     
     def embed_texts(self, texts: List[str]) -> np.ndarray:
-        """
-        Embed multiple texts.
-        
-        Args:
-            texts: List of text strings
-            
-        Returns:
-            NumPy array of embeddings
-        """
+        """Embed multiple texts."""
         return self.model.encode(texts)
     
     def embed_single(self, text: str) -> np.ndarray:
-        """
-        Embed a single text.
-        
-        Args:
-            text: Text string to embed
-            
-        Returns:
-            NumPy array of single embedding
-        """
+        """Embed a single text."""
         return self.model.encode([text])[0]
     
     def get_dimension(self) -> int:
@@ -150,21 +83,7 @@ def create_embedding_service(
     model_name: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
     **kwargs
 ) -> EmbeddingService:
-    """
-    Factory function to create embedding service.
-    
-    Args:
-        model_type: Type of embedding model ('sentence-transformers', 'openai', etc.)
-        model_name: Name of the specific model
-        **kwargs: Additional arguments for model initialization
-        
-    Returns:
-        EmbeddingService instance
-        
-    Example:
-        >>> service = create_embedding_service('sentence-transformers')
-        >>> embeddings = service.embed_texts(['Hello', 'World'])
-    """
+    """Factory function to create embedding service."""
     if model_type == "sentence-transformers":
         model = SentenceTransformerEmbedding(model_name)
     elif model_type == "openai":

@@ -1,8 +1,4 @@
-/**
- * Main page for the Perso.ai chatbot.
- * 
- * This is the entry point of the application.
- */
+"""Main page for the Perso.ai chatbot."""
 
 import ChatInterface from '@/components/ChatInterface';
 

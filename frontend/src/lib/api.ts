@@ -1,13 +1,7 @@
-/**
- * API client for communicating with the backend.
- * 
- * This module provides typed functions for making API calls
- * to the FastAPI backend.
- */
+"""API client for communicating with the backend."""
 
 import axios, { AxiosInstance } from 'axios';
 
-// Types
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
@@ -36,9 +30,6 @@ export interface HealthResponse {
   qdrant_connected: boolean;
 }
 
-/**
- * API Client class for backend communication.
- */
 class ApiClient {
   private client: AxiosInstance;
 
@@ -50,17 +41,10 @@ class ApiClient {
       headers: {
         'Content-Type': 'application/json',
       },
-      timeout: 30000, // 30 seconds
+      timeout: 30000,
     });
   }
 
-  /**
-   * Send a chat message and get a response.
-   * 
-   * @param message - User's message
-   * @param conversationHistory - Previous conversation history
-   * @returns Chat response with answer and retrieved chunks
-   */
   async sendMessage(
     message: string,
     conversationHistory: ChatMessage[] = []
@@ -78,11 +62,6 @@ class ApiClient {
     }
   }
 
-  /**
-   * Check the health status of the backend.
-   * 
-   * @returns Health status information
-   */
   async checkHealth(): Promise<HealthResponse> {
     try {
       const response = await this.client.get<HealthResponse>('/health');
@@ -94,5 +73,4 @@ class ApiClient {
   }
 }
 
-// Export singleton instance
 export const apiClient = new ApiClient();

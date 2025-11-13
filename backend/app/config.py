@@ -1,9 +1,4 @@
-"""
-Configuration management for the Perso.ai chatbot backend.
-
-This module handles all environment variables and application settings
-using Pydantic BaseSettings for type safety and validation.
-"""
+"""Configuration management for the Perso.ai chatbot backend."""
 
 from pydantic_settings import BaseSettings
 from typing import Optional
@@ -57,5 +52,4 @@ class Settings(BaseSettings):
         case_sensitive = False
 
 
-# Global settings instance
 settings = Settings()

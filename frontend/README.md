@@ -1,48 +1,45 @@
 # Perso.ai Chatbot - Frontend
 
-Next.js 기반 채팅 인터페이스
+Next.js-based chat interface
 
-## 🚀 빠른 시작
+## Quick Start
 
-### 1. 의존성 설치
+### 1. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 2. 환경 변수 설정
+### 2. Environment Variables
 
 ```bash
-# .env.local 파일 생성
 cp .env.example .env.local
-
-# 필요한 경우 API URL 수정
-# NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+# Edit NEXT_PUBLIC_API_URL if needed
 ```
 
-### 3. 개발 서버 실행
+### 3. Start Development Server
 
 ```bash
 npm run dev
 ```
 
-브라우저에서 http://localhost:3000 을 열어 확인합니다.
+Open http://localhost:3000
 
-## 🏗️ 프로젝트 구조
+## Project Structure
 
 ```
 src/
 ├── app/
-│   ├── page.tsx           # 메인 페이지
-│   ├── layout.tsx         # 루트 레이아웃
-│   └── globals.css        # 글로벌 스타일
+│   ├── page.tsx           # Main page
+│   ├── layout.tsx         # Root layout
+│   └── globals.css        # Global styles
 ├── components/
-│   └── ChatInterface.tsx  # 채팅 인터페이스 컴포넌트
+│   └── ChatInterface.tsx  # Chat interface component
 └── lib/
-    └── api.ts             # API 클라이언트
+    └── api.ts             # API client
 ```
 
-## 🎨 기술 스택
+## Tech Stack
 
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
@@ -51,104 +48,101 @@ src/
 - **HTTP Client**: Axios
 - **Markdown**: React Markdown
 
-## 🔑 주요 기능
+## Key Features
 
-### ChatInterface 컴포넌트
-- ChatGPT 스타일의 UI
-- 실시간 메시지 전송
-- 대화 이력 관리
-- 로딩 상태 표시
-- 신뢰도 점수 표시
+### ChatInterface Component
+- ChatGPT-style UI
+- Real-time message sending
+- Conversation history management
+- Loading state display
+- Confidence score display
 
-### API 클라이언트
-- TypeScript로 타입 안전성 보장
-- Axios 기반 HTTP 통신
-- 에러 핸들링
-- 타임아웃 설정
+### API Client
+- Type safety with TypeScript
+- Axios-based HTTP communication
+- Error handling
+- Timeout configuration
 
-## 🎯 컴포넌트 설명
+## Component Description
 
 ### ChatInterface
-채팅 인터페이스의 메인 컴포넌트입니다.
+Main component for chat interface.
 
-**주요 기능:**
-- 메시지 입력 및 전송
-- 대화 이력 표시
-- 샘플 질문 제공
-- 자동 스크롤
-- 반응형 디자인
+**Features:**
+- Message input and sending
+- Conversation history display
+- Sample questions
+- Auto-scroll
+- Responsive design
 
-**상태 관리:**
-- `messages`: 채팅 메시지 목록
-- `inputMessage`: 입력 중인 메시지
-- `isLoading`: 로딩 상태
+**State Management:**
+- `messages`: Chat message list
+- `inputMessage`: Message being typed
+- `isLoading`: Loading state
 
-## 🌐 배포
+## Deployment
 
-### Vercel 배포
+### Vercel Deployment
 
 ```bash
-# Vercel CLI 설치
 npm i -g vercel
-
-# 배포
 vercel
 ```
 
-또는 GitHub 연동:
-1. GitHub 저장소에 푸시
-2. Vercel에서 프로젝트 import
-3. 환경 변수 설정
-4. 자동 배포
+Or via GitHub:
+1. Push to GitHub repository
+2. Import project in Vercel
+3. Set environment variables
+4. Auto-deploy
 
-### 환경 변수 (Vercel)
-배포 시 다음 환경 변수를 설정하세요:
-- `NEXT_PUBLIC_API_URL`: 백엔드 API URL
+### Environment Variables (Vercel)
+Set the following environment variable during deployment:
+- `NEXT_PUBLIC_API_URL`: Backend API URL
 
-## 🎨 스타일 커스터마이징
+## Style Customization
 
-### Tailwind 색상 변경
-`tailwind.config.js` 파일에서 primary 색상을 수정:
+### Tailwind Color Change
+Modify primary color in `tailwind.config.js`:
 
 ```javascript
 theme: {
   extend: {
     colors: {
       primary: {
-        // 원하는 색상으로 변경
+        // Change to desired color
       },
     },
   },
 }
 ```
 
-### 채팅 버블 스타일
-`ChatInterface.tsx`에서 클래스명 수정:
+### Chat Bubble Style
+Modify class names in `ChatInterface.tsx`:
 
 ```typescript
 className={`max-w-2xl px-6 py-4 rounded-2xl ${
   message.role === 'user'
-    ? 'bg-primary-500 text-white'  // 사용자 메시지
-    : 'bg-white border border-gray-200'  // AI 응답
+    ? 'bg-primary-500 text-white'
+    : 'bg-white border border-gray-200'
 }`}
 ```
 
-## 📱 반응형 디자인
+## Responsive Design
 
-- 모바일: 세로 레이아웃, 버튼 크기 조정
-- 태블릿: 중간 크기 레이아웃
-- 데스크톱: 최대 너비 제한 (max-w-3xl)
+- Mobile: Vertical layout, adjusted button sizes
+- Tablet: Medium-sized layout
+- Desktop: Max width constraint (max-w-3xl)
 
-## 🐛 트러블슈팅
+## Troubleshooting
 
-### API 연결 실패
+### API Connection Failed
 ```typescript
-// lib/api.ts 에서 baseURL 확인
+// Check baseURL in lib/api.ts
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 ```
 
-### CORS 에러
-백엔드의 CORS 설정을 확인하세요:
+### CORS Error
+Check backend CORS settings:
 ```python
 # backend/app/config.py
 cors_origins: list[str] = [
@@ -157,16 +151,15 @@ cors_origins: list[str] = [
 ]
 ```
 
-### 빌드 에러
+### Build Error
 ```bash
-# 캐시 삭제 후 재빌드
 rm -rf .next
 npm run build
 ```
 
-## 📝 개발 가이드
+## Development Guide
 
-### 새 컴포넌트 추가
+### Add New Component
 ```typescript
 // src/components/NewComponent.tsx
 'use client';
@@ -178,7 +171,7 @@ export default function NewComponent() {
 }
 ```
 
-### API 클라이언트 확장
+### Extend API Client
 ```typescript
 // src/lib/api.ts
 async newApiMethod(): Promise<ResponseType> {

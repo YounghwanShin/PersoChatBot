@@ -10,7 +10,6 @@
 }
 
 @layer components {
-  /* Custom scrollbar */
   .custom-scrollbar::-webkit-scrollbar {
     @apply w-2;
   }
@@ -28,7 +27,6 @@
   }
 }
 
-/* Markdown styling */
 .markdown-content {
   @apply text-gray-900;
 }
