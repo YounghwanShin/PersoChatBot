@@ -73,19 +73,54 @@ class PreprocessingService:
         df = self.load_data()
         chunks = []
         
+        # Variable to handle split rows (due to merged cells)
+        current_question_part = None
+        chunk_counter = 1
+        
         for idx, row in df.iterrows():
-            # Get content from the '내  용' column
-            content = str(row.get('내  용', ''))
+            # Find the cell containing the content (ignoring specific column names)
+            content = ""
+            for col in df.columns:
+                val = str(row[col])
+                if "Q." in val or "A." in val:
+                    content = val
+                    break
             
-            if not content or content == 'nan':
+            if not content:
+                continue
+            
+            full_text = ""
+
+            # Case 1: Single cell containing both Question and Answer
+            if "Q." in content and "A." in content:
+                full_text = content
+                current_question_part = None  # Reset state if mixed
+
+            # Case 2: Row contains only the Question (start of merged cell)
+            elif "Q." in content:
+                current_question_part = content
+                continue  # Wait for the next row (Answer)
+            
+            # Case 3: Row contains only the Answer (end of merged cell)
+            elif "A." in content:
+                if current_question_part:
+                    # Combine previous question part with current answer part
+                    full_text = f"{current_question_part}\n{content}"
+                    current_question_part = None  # Reset state
+                else:
+                    continue
+            else:
                 continue
             
             # Parse Q&A
-            qa_data = self.parse_qa_content(content)
+            qa_data = self.parse_qa_content(full_text)
+            
+            if not qa_data["question"] or not qa_data["answer"]:
+                continue
             
             # Create chunk
             chunk = {
-                "id": str(idx + 1),
+                "id": str(chunk_counter),
                 "question": qa_data["question"],
                 "answer": qa_data["answer"],
                 # Combine Q&A for embedding
@@ -98,6 +133,7 @@ class PreprocessingService:
             }
             
             chunks.append(chunk)
+            chunk_counter += 1
         
         return chunks
     
