@@ -13,12 +13,12 @@ User Query → Query Rewriter → Vector DB Search →
 Context Retrieval → LLM Generation → Response
 ```
 
-### 주요 구성요소
+### 주요 모듈들
 
-1. **Query Rewriter (Gemini)**: Gemini API를 사용하여 사용자 쿼리를 검색에 최적화된 형태로 재작성
-2. **Vector Store (Qdrant)**: 문서 임베딩을 저장하고 유사도 검색 수행
-3. **Embedding (Gemini)**: 텍스트를 벡터로 변환
-4. **LLM (Gemini)**: 검색된 컨텍스트 기반 답변 생성
+1. **Query Rewriter (Gemini)**: Gemini API를 사용하여 사용자 쿼리를 검색에 최적화된 형태로 재작성하는 모듈
+2. **Vector Store (Qdrant)**: 문서 임베딩을 저장하고 유사도 검색을 수행하는 모듈
+3. **Embedding (Gemini)**: 텍스트를 벡터로 변환하는 모듈
+4. **LLM (Gemini)**: 검색된 컨텍스트를 기반으로 답변을 생성하는 모듈
 
 ## 기술 스택
 
@@ -37,26 +37,29 @@ Context Retrieval → LLM Generation → Response
 ### 기술 선택 이유
 
 1. **Gemini API (Query Rewriting, Embedding & LLM)**
-   - 빠른 응답 속도와 안정적인 성능
-   - 무료 티어로 충분한 사용량 제공
-   - 로컬 모델 로딩 시간 없이 즉시 사용 가능
-   - 배포 환경에서 리소스 부담 최소화
-   - LLM 기반 쿼리 재작성으로 검색 정확도 향상
+   응답 속도가 빠르고 높은 성능을 가지고 있어서 사용하였습니다.
+   본래, 임베딩의 경우엔 huggingface에서 모델을 불러와 구현하였지만,
+   로컬 모델 로딩과 임베딩 계산시간이 render 무료티어로는 불가능하여 Gemini Embedding API를 사용하게 되었습니다.
+   
+2. **Qdrant (Vector Database)**
+   RAG 시스템에서는 정확한 문맥 검색이 중요하다고 생각합니다.
+   이를 위해 고성능 벡터 데이터베이스인 Qdrant를 도입했습니다.
+   Qdrant는 대규모 데이터에서도 코사인 유사도 기반의 고속 검색을 지원하며,
+   Docker 컨테이너 환경에서의 배포가 매우 용이합니다.
+   또한 Python 클라이언트와의 유연한 연동성을 갖추고 있어,
+   복잡한 설정 없이도 안정적인 지식 저장소를 구축할 수 있어 채택했습니다.
 
-2. **Qdrant**
-   - 빠른 벡터 검색 성능
-   - 간단한 설치 및 관리
-   - Docker 기반 배포 용이
+3. FastAPI (Backend Framework)
+   LLM 및 벡터 DB와의 통신 과정에서 발생할 수 있는 지연 시간을 효율적으로 관리하기 위해
+   Python의 최신 웹 프레임워크인 FastAPI를 사용했습니다.
+   FastAPI는 Async 처리를 기본적으로 지원하여 다수의 요청을 병목 없이 처리할 수 있으며,
+   Pydantic을 이용한 데이터 검증과 Swagger UI 자동 생성 기능을 통해
+   개발 생산성과 API 신뢰성을 동시에 확보할 수 있었습니다.
 
-3. **FastAPI**
-   - 높은 성능과 간결한 코드
-   - 자동 API 문서화
-   - 비동기 처리 지원
-
-4. **Next.js**
-   - 서버 사이드 렌더링 지원
-   - 우수한 개발 경험
-   - Vercel 배포 최적화
+4. Next.js 14 & Tailwind CSS (Frontend)
+   사용자에게 끊김 없는 채팅 경험을 제공하기 위해 React 기반의 Next.js 14를 프론트엔드 프레임워크로 선정했습니다.
+   서버 사이드 렌더링(SSR) 지원으로 초기 로딩 속도를 최적화하였으며,
+   TypeScript와 Tailwind CSS를 결합하여 타입 안정성을 보장하면서도 모던하고 반응형인 UI를 구현했습니다.
 
 ## 실행 방법
 
@@ -183,17 +186,3 @@ perso-ai-chatbot/
 2. Vercel에서 프로젝트 임포트
 3. 환경 변수 설정 (NEXT_PUBLIC_API_URL)
 4. 자동 배포
-
-### 필수 환경 변수
-
-**Backend:**
-- `GEMINI_API_KEY`: Gemini API 키
-- `QDRANT_HOST`: Qdrant 호스트
-- `QDRANT_PORT`: Qdrant 포트
-
-**Frontend:**
-- `NEXT_PUBLIC_API_URL`: Backend API URL
-
-## 라이선스
-
-MIT License
