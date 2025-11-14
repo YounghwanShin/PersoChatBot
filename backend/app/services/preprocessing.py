@@ -7,36 +7,56 @@ import re
 
 class PreprocessingService:
     """Service for preprocessing Q&A data from Excel files."""
-    
+
     def __init__(self, file_path: str):
+        """Initialize preprocessing service.
+
+        Args:
+            file_path: Path to Excel file
+        """
         self.file_path = file_path
-    
+
     def load_data(self) -> pd.DataFrame:
-        """Load Q&A data from Excel file."""
+        """Load Q&A data from Excel file.
+
+        Returns:
+            DataFrame with Q&A data
+        """
         df = pd.read_excel(self.file_path)
         return df
-    
+
     def parse_qa_content(self, content: str) -> Dict[str, str]:
-        """Parse Q&A content from a single cell."""
+        """Parse Q&A content from a single cell.
+
+        Args:
+            content: Raw content string
+
+        Returns:
+            Dictionary with question and answer
+        """
         question_match = re.search(r'Q\.\s*(.+?)(?=A\.|$)', content, re.DOTALL)
         answer_match = re.search(r'A\.\s*(.+?)$', content, re.DOTALL)
-        
+
         question = question_match.group(1).strip() if question_match else ""
         answer = answer_match.group(1).strip() if answer_match else ""
-        
+
         return {
             "question": question,
             "answer": answer
         }
-    
+
     def create_chunks(self) -> List[Dict[str, any]]:
-        """Create structured chunks from Q&A data."""
+        """Create structured chunks from Q&A data.
+
+        Returns:
+            List of chunk dictionaries
+        """
         df = self.load_data()
         chunks = []
-        
+
         current_question_part = None
         chunk_counter = 1
-        
+
         for idx, row in df.iterrows():
             content = ""
             for col in df.columns:
@@ -44,10 +64,10 @@ class PreprocessingService:
                 if "Q." in val or "A." in val:
                     content = val
                     break
-            
+
             if not content:
                 continue
-            
+
             full_text = ""
 
             if "Q." in content and "A." in content:
@@ -64,12 +84,12 @@ class PreprocessingService:
                     continue
             else:
                 continue
-            
+
             qa_data = self.parse_qa_content(full_text)
-            
+
             if not qa_data["question"] or not qa_data["answer"]:
                 continue
-            
+
             chunk = {
                 "id": str(chunk_counter),
                 "question": qa_data["question"],
@@ -81,20 +101,27 @@ class PreprocessingService:
                     "category": "perso_ai"
                 }
             }
-            
+
             chunks.append(chunk)
             chunk_counter += 1
-        
+
         return chunks
-    
+
     def validate_chunks(self, chunks: List[Dict[str, any]]) -> bool:
-        """Validate that all chunks have required fields."""
+        """Validate that all chunks have required fields.
+
+        Args:
+            chunks: List of chunks to validate
+
+        Returns:
+            True if all chunks are valid
+        """
         required_fields = ["id", "question", "answer", "content", "metadata"]
-        
+
         for chunk in chunks:
             if not all(field in chunk for field in required_fields):
                 return False
             if not chunk["question"] or not chunk["answer"]:
                 return False
-        
+
         return True

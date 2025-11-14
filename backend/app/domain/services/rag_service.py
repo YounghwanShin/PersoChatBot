@@ -1,10 +1,14 @@
-"""RAG (Retrieval-Augmented Generation) service."""
+"""RAG (Retrieval-Augmented Generation) service with business logic."""
 
 from typing import List, Dict, Tuple
-from .embedding import EmbeddingService
-from .vector_store import VectorStoreService
-from .query_rewriter import QueryRewriterService
-from .llm_client import LLMClient
+import numpy as np
+
+from ...core.interfaces import (
+    EmbeddingModelProtocol,
+    VectorStoreProtocol,
+    LLMClientProtocol,
+    QueryProcessorProtocol
+)
 
 
 class RAGService:
@@ -12,14 +16,22 @@ class RAGService:
 
     def __init__(
         self,
-        embedding_service: EmbeddingService,
-        vector_store: VectorStoreService,
-        query_rewriter: QueryRewriterService,
-        llm_client: LLMClient
+        embedding_model: EmbeddingModelProtocol,
+        vector_store: VectorStoreProtocol,
+        query_processor: QueryProcessorProtocol,
+        llm_client: LLMClientProtocol
     ):
-        self.embedding_service = embedding_service
+        """Initialize RAG service.
+
+        Args:
+            embedding_model: Model for generating embeddings
+            vector_store: Vector store for retrieval
+            query_processor: Processor for query rewriting
+            llm_client: LLM client for generation
+        """
+        self.embedding_model = embedding_model
         self.vector_store = vector_store
-        self.query_rewriter = query_rewriter
+        self.query_processor = query_processor
         self.llm_client = llm_client
 
     def retrieve_context(
@@ -28,9 +40,18 @@ class RAGService:
         top_k: int = 3,
         score_threshold: float = 0.5
     ) -> Tuple[List[Dict], str]:
-        """Retrieve relevant context for a query."""
-        rewritten_query = self.query_rewriter.rewrite_query(query, expand=True)
-        query_embedding = self.embedding_service.embed_single(rewritten_query)
+        """Retrieve relevant context for a query.
+
+        Args:
+            query: User query
+            top_k: Number of results to retrieve
+            score_threshold: Minimum similarity threshold
+
+        Returns:
+            Tuple of (retrieved chunks, processed query)
+        """
+        processed_query = self.query_processor.process_query(query)
+        query_embedding = self.embedding_model.encode([processed_query])[0]
 
         results = self.vector_store.search(
             query_embedding=query_embedding,
@@ -38,10 +59,17 @@ class RAGService:
             score_threshold=score_threshold
         )
 
-        return results, rewritten_query
+        return results, processed_query
 
     def format_context(self, retrieved_chunks: List[Dict]) -> str:
-        """Format retrieved chunks into context string."""
+        """Format retrieved chunks into context string.
+
+        Args:
+            retrieved_chunks: Retrieved document chunks
+
+        Returns:
+            Formatted context string
+        """
         if not retrieved_chunks:
             return "관련 정보를 찾을 수 없습니다."
 
@@ -62,7 +90,16 @@ class RAGService:
         context: str,
         conversation_history: List[Dict] = None
     ) -> str:
-        """Generate response using LLM with retrieved context."""
+        """Generate response using LLM with retrieved context.
+
+        Args:
+            query: User query
+            context: Formatted context from retrieval
+            conversation_history: Previous conversation (unused in current version)
+
+        Returns:
+            Generated answer
+        """
         system_prompt = """You are an AI assistant that answers questions about Perso.ai.
 
 Important rules:
@@ -80,16 +117,18 @@ Please answer the question based on the above reference materials."""
 
         full_prompt = f"{system_prompt}\n\n{user_prompt}"
 
-        try:
-            response = self.llm_client.generate(full_prompt)
-            return response
-
-        except Exception as e:
-            print(f"Error generating response: {e}")
-            return "죄송합니다. 답변을 생성하는 중 오류가 발생했습니다."
+        response = self.llm_client.generate(full_prompt)
+        return response
 
     def calculate_confidence(self, retrieved_chunks: List[Dict]) -> float:
-        """Calculate confidence score based on retrieval quality."""
+        """Calculate confidence score based on retrieval quality.
+
+        Args:
+            retrieved_chunks: Retrieved document chunks
+
+        Returns:
+            Confidence score between 0 and 1
+        """
         if not retrieved_chunks:
             return 0.0
 
@@ -109,8 +148,18 @@ Please answer the question based on the above reference materials."""
         top_k: int = 3,
         score_threshold: float = 0.5
     ) -> Dict:
-        """Main chat function combining retrieval and generation."""
-        retrieved_chunks, rewritten_query = self.retrieve_context(
+        """Main chat function combining retrieval and generation.
+
+        Args:
+            query: User query
+            conversation_history: Previous conversation
+            top_k: Number of documents to retrieve
+            score_threshold: Minimum similarity threshold
+
+        Returns:
+            Dictionary with answer, chunks, confidence, and rewritten query
+        """
+        retrieved_chunks, processed_query = self.retrieve_context(
             query=query,
             top_k=top_k,
             score_threshold=score_threshold
@@ -137,5 +186,5 @@ Please answer the question based on the above reference materials."""
                 for chunk in retrieved_chunks
             ],
             "confidence": confidence,
-            "rewritten_query": rewritten_query
+            "rewritten_query": processed_query
         }

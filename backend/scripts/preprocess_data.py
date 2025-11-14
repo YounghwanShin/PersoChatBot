@@ -5,10 +5,10 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.config import settings
+from app.core.config import settings
 from app.services.preprocessing import PreprocessingService
-from app.services.embedding import create_embedding_service
-from app.services.vector_store import VectorStoreService
+from app.infrastructure.embedding import create_embedding_model
+from app.infrastructure.vector_store import create_vector_store
 
 
 def main():
@@ -34,16 +34,16 @@ def main():
         print(f"Error preprocessing data: {e}")
         return
     
-    # Step 2: Initialize embedding service
-    print("\n[Step 2] Initializing embedding service...")
+    # Step 2: Initialize embedding model
+    print("\n[Step 2] Initializing embedding model...")
     try:
-        embedding_service = create_embedding_service(
+        embedding_model = create_embedding_model(
             api_key=settings.gemini_api_key,
             model_name=settings.embedding_model,
             dimension=settings.embedding_dimension
         )
         print(f"Loaded embedding model: {settings.embedding_model}")
-        print(f"Embedding dimension: {embedding_service.get_dimension()}")
+        print(f"Embedding dimension: {embedding_model.get_dimension()}")
         
     except Exception as e:
         print(f"Error loading embedding model: {e}")
@@ -53,7 +53,7 @@ def main():
     print("\n[Step 3] Generating embeddings...")
     try:
         contents = [chunk["content"] for chunk in chunks]
-        embeddings = embedding_service.embed_texts(contents)
+        embeddings = embedding_model.encode(contents)
         print(f"Generated {len(embeddings)} embeddings")
         print(f"Embedding shape: {embeddings.shape}")
         
@@ -64,7 +64,7 @@ def main():
     # Step 4: Initialize Qdrant
     print("\n[Step 4] Connecting to Qdrant...")
     try:
-        vector_store = VectorStoreService(
+        vector_store = create_vector_store(
             host=settings.qdrant_host,
             port=settings.qdrant_port,
             collection_name=settings.qdrant_collection_name,
@@ -125,8 +125,8 @@ def main():
     try:
         test_query = "Perso.ai는 무엇인가요?"
         print(f"Test query: {test_query}")
-        
-        query_embedding = embedding_service.embed_single(test_query)
+
+        query_embedding = embedding_model.encode([test_query])[0]
         results = vector_store.search(query_embedding, top_k=3)
         
         print(f"\nFound {len(results)} results:")
