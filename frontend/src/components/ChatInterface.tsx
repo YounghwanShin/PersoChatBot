@@ -172,7 +172,7 @@ export default function ChatInterface() {
                   <ReactMarkdown>{message.content}</ReactMarkdown>
                 </div>
 
-                {message.confidence && (
+                {message.confidence && message.role === 'assistant' && (
                   <div className="mt-3 pt-3 border-t border-gray-200/50">
                     <div className="flex items-center gap-2">
                       <div className="flex-1 bg-gray-200 rounded-full h-1.5 overflow-hidden">
