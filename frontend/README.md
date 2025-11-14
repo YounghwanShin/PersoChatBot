@@ -14,7 +14,6 @@ npm install
 
 ```bash
 cp .env.example .env.local
-# 필요시 NEXT_PUBLIC_API_URL 수정
 ```
 
 ### 3. 개발 서버 시작
