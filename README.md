@@ -1,6 +1,31 @@
-# Perso.ai 지식기반 챗봇
+<div align="center">
 
-Vector DB 기반 RAG 시스템을 활용한 Q&A 챗봇
+# 🤖 Perso.ai 지식기반 챗봇
+
+<p align="center">
+  <strong>Vector DB 기반 RAG 시스템을 활용한 지능형 Q&A 챗봇</strong>
+</p>
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Qdrant](https://img.shields.io/badge/Qdrant-DC244C?logo=qdrant&logoColor=white)](https://qdrant.tech/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Gemini](https://img.shields.io/badge/Gemini_API-8E75B2?logo=google&logoColor=white)](https://ai.google.dev/)
+
+<img src="assets/image.png" alt="Chatbot Demo" width="800"/>
+
+<br/>
+
+<a href="https://perso-chat-bot.vercel.app">
+  <img src="https://img.shields.io/badge/🌐_Live_Demo-Visit_Site-4285F4?style=for-the-badge" alt="Live Demo"/>
+</a>
+
+<br/>
+
+</div>
 
 ## 프로젝트 개요
 
@@ -92,10 +117,10 @@ TypeScript로 API 응답 타입을 명확히 정의할 수 있어 런타임 에�
 
 ### 데이터 전처리 및 인덱싱
 
-1. **데이터 파싱**: Excel 파일에서 Q&A 쌍을 추출하고 구조화
-2. **청크 생성**: 각 Q&A를 "질문: {question}\n답변: {answer}" 형태로 결합
-3. **임베딩 생성**: Gemini Embedding API로 각 청크를 768차원 벡터로 변환
-4. **인덱싱**: Qdrant에 벡터와 메타데이터를 저장
+1. Excel 파일에서 Q&A 쌍을 추출하고 구조화
+2. 각 Q&A를 "질문: {question}\n답변: {answer}" 형태로 결합
+3. Gemini Embedding API로 각 청크를 768차원 벡터로 변환
+4. Qdrant에 벡터와 메타데이터를 저장
 
 ### 검색 과정
 
@@ -132,7 +157,7 @@ TypeScript로 API 응답 타입을 명확히 정의할 수 있어 런타임 에�
 
 검색된 컨텍스트를 구조화된 형태로 LLM에 제공하고, 프롬프트 엔지니어링을 통해 Hallucination 방지
 
-**포맷:**
+**포맷**
 ```
 [참고 자료 1]
 질문: ...
