@@ -84,7 +84,7 @@ export default function ChatInterface() {
     <div className="flex flex-col h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <h1 className="text-2xl font-bold text-gray-900">
-          Perso.ai 지식 챗봇
+          Perso.ai 질의응답 챗봇
         </h1>
         <p className="text-sm text-gray-600 mt-1">
           Perso.ai에 대해 무엇이든 물어보세요
