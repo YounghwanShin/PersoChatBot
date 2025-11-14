@@ -64,7 +64,7 @@
 }
 
 .prose p {
-  @apply mb-3 leading-relaxed;
+  @apply mb-0 leading-snug;
 }
 
 .prose ul,

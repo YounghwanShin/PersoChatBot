@@ -162,7 +162,7 @@ export default function ChatInterface() {
               <div
                 className={`max-w-2xl ${
                   message.role === 'user'
-                    ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg'
+                    ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg flex items-center'
                     : 'bg-white/90 backdrop-blur border border-gray-200 shadow-md'
                 } px-5 py-4 rounded-2xl`}
               >
