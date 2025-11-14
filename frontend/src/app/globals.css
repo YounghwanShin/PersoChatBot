@@ -15,7 +15,7 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-gray-100;
+    @apply bg-transparent;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -27,54 +27,114 @@
   }
 }
 
-.markdown-content {
+@layer utilities {
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+}
+
+.prose {
   @apply text-gray-900;
 }
 
-.markdown-content p {
-  @apply mb-4;
+.prose p {
+  @apply mb-3 leading-relaxed;
 }
 
-.markdown-content ul,
-.markdown-content ol {
-  @apply mb-4 ml-6;
+.prose ul,
+.prose ol {
+  @apply mb-3 ml-5 list-disc;
 }
 
-.markdown-content li {
-  @apply mb-2;
+.prose ol {
+  @apply list-decimal;
 }
 
-.markdown-content code {
-  @apply bg-gray-100 px-1 py-0.5 rounded text-sm;
+.prose li {
+  @apply mb-1.5;
 }
 
-.markdown-content pre {
-  @apply bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4;
+.prose code {
+  @apply bg-gray-100 px-2 py-0.5 rounded text-sm font-mono;
 }
 
-.markdown-content pre code {
+.prose pre {
+  @apply bg-gray-100 p-4 rounded-lg overflow-x-auto mb-3;
+}
+
+.prose pre code {
   @apply bg-transparent p-0;
 }
 
-.markdown-content a {
-  @apply text-primary-600 hover:text-primary-700 underline;
+.prose a {
+  @apply text-blue-600 hover:text-blue-700 underline;
 }
 
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3,
-.markdown-content h4 {
-  @apply font-bold mb-3;
+.prose strong {
+  @apply font-semibold;
 }
 
-.markdown-content h1 {
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  @apply font-bold mb-2 mt-4;
+}
+
+.prose h1 {
   @apply text-2xl;
 }
 
-.markdown-content h2 {
+.prose h2 {
   @apply text-xl;
 }
 
-.markdown-content h3 {
+.prose h3 {
   @apply text-lg;
+}
+
+.prose-invert {
+  @apply text-white;
+}
+
+.prose-invert p {
+  @apply text-white;
+}
+
+.prose-invert code {
+  @apply bg-white/20 text-white;
+}
+
+.prose-invert a {
+  @apply text-blue-200 hover:text-blue-100;
+}
+
+.prose-invert strong {
+  @apply text-white font-semibold;
 }
