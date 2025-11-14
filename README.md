@@ -15,7 +15,7 @@
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![Gemini](https://img.shields.io/badge/Gemini_API-8E75B2?logo=google&logoColor=white)](https://ai.google.dev/)
 
-<img src="image.png" alt="Chatbot Demo" width="800"/>
+<img src="assets/image.png" alt="Chatbot Demo" width="800"/>
 
 <br/>
 
