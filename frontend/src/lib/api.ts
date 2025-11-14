@@ -50,7 +50,7 @@ class ApiClient {
     conversationHistory: ChatMessage[] = []
   ): Promise<ChatResponse> {
     try {
-      const response = await this.client.post<ChatResponse>('/chat', {
+      const response = await this.client.post<ChatResponse>('/chat/', {
         message,
         conversation_history: conversationHistory,
       });
