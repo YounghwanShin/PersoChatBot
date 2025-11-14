@@ -41,9 +41,14 @@ class Settings(BaseSettings):
     
     # LLM Configuration
     gemini_api_key: str
-    llm_model: str = "gemini-2.0-flash-exp"
+    llm_model: str = "gemini-2.0-flash"
     llm_temperature: float = 0.1
     llm_max_tokens: int = 512
+
+    # Query Rewriter Configuration
+    query_rewriter_model: str = "gemini-2.0-flash"
+    query_rewriter_temperature: float = 0.3
+    query_rewriter_max_tokens: int = 100
     
     # Data Configuration
     data_file: str = "data/Q&A.xlsx"

@@ -128,6 +128,7 @@ perso-ai-chatbot/
 │   │   └── services/
 │   │       ├── preprocessing.py # 데이터 전처리
 │   │       ├── embedding.py     # 임베딩 서비스
+│   │       ├── llm_client.py    # LLM 클라이언트
 │   │       ├── vector_store.py  # Qdrant 관리
 │   │       ├── query_rewriter.py# 쿼리 최적화
 │   │       └── rag_service.py   # RAG 통합
