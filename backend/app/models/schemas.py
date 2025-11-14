@@ -1,7 +1,7 @@
 """Pydantic models for request/response validation."""
 
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List
 
 
 class ChatMessage(BaseModel):

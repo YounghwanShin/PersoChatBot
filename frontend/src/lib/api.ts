@@ -1,5 +1,3 @@
-// API client for communicating with the backend.
-
 import axios, { AxiosInstance } from 'axios';
 
 export interface ChatMessage {

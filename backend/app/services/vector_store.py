@@ -52,7 +52,7 @@ class VectorStoreService:
                 )
             )
             
-            print(f"Created collection '{self.collection_name}'")
+            print(f"Created collection: {self.collection_name}")
             return True
             
         except Exception as e:

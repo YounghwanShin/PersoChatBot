@@ -32,8 +32,8 @@ class Settings(BaseSettings):
     qdrant_api_key: Optional[str] = None
     
     # Embedding Configuration
-    embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-    embedding_dimension: int = 384
+    embedding_model: str = "gemini-embedding-001"
+    embedding_dimension: int = 768
     
     # Retrieval Configuration
     top_k_retrieval: int = 3
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     
     # LLM Configuration
     gemini_api_key: str
-    llm_model: str = "gemini-1.5-flash"
+    llm_model: str = "gemini-2.0-flash-exp"
     llm_temperature: float = 0.1
     llm_max_tokens: int = 512
     

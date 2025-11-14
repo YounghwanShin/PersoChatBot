@@ -1,45 +1,45 @@
 # Perso.ai Chatbot - Frontend
 
-Next.js-based chat interface
+Next.js 기반 채팅 인터페이스
 
-## Quick Start
+## 실행 방법
 
-### 1. Install Dependencies
+### 1. 종속성 설치
 
 ```bash
 npm install
 ```
 
-### 2. Environment Variables
+### 2. 환경 변수
 
 ```bash
 cp .env.example .env.local
-# Edit NEXT_PUBLIC_API_URL if needed
+# 필요시 NEXT_PUBLIC_API_URL 수정
 ```
 
-### 3. Start Development Server
+### 3. 개발 서버 시작
 
 ```bash
 npm run dev
 ```
 
-Open http://localhost:3000
+http://localhost:3000 에서 실행됩니다.
 
-## Project Structure
+## 프로젝트 구조
 
 ```
 src/
 ├── app/
-│   ├── page.tsx           # Main page
-│   ├── layout.tsx         # Root layout
-│   └── globals.css        # Global styles
+│   ├── page.tsx           # 메인 페이지
+│   ├── layout.tsx         # 루트 레이아웃
+│   └── globals.css        # 전역 스타일
 ├── components/
-│   └── ChatInterface.tsx  # Chat interface component
+│   └── ChatInterface.tsx  # 채팅 인터페이스
 └── lib/
-    └── api.ts             # API client
+    └── api.ts             # API 클라이언트
 ```
 
-## Tech Stack
+## 기술 스택
 
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
@@ -48,134 +48,56 @@ src/
 - **HTTP Client**: Axios
 - **Markdown**: React Markdown
 
-## Key Features
+## 주요 기능
 
-### ChatInterface Component
-- ChatGPT-style UI
-- Real-time message sending
-- Conversation history management
-- Loading state display
-- Confidence score display
+### ChatInterface 컴포넌트
+- ChatGPT 스타일 UI
+- 실시간 메시지 전송
+- 대화 기록 관리
+- 로딩 상태 표시
+- 신뢰도 점수 표시
 
 ### API Client
-- Type safety with TypeScript
-- Axios-based HTTP communication
-- Error handling
-- Timeout configuration
+- TypeScript 타입 안정성
+- Axios 기반 HTTP 통신
+- 에러 처리
+- 타임아웃 설정
 
-## Component Description
+## 배포
 
-### ChatInterface
-Main component for chat interface.
-
-**Features:**
-- Message input and sending
-- Conversation history display
-- Sample questions
-- Auto-scroll
-- Responsive design
-
-**State Management:**
-- `messages`: Chat message list
-- `inputMessage`: Message being typed
-- `isLoading`: Loading state
-
-## Deployment
-
-### Vercel Deployment
+### Vercel
 
 ```bash
 npm i -g vercel
 vercel
 ```
 
-Or via GitHub:
-1. Push to GitHub repository
-2. Import project in Vercel
-3. Set environment variables
-4. Auto-deploy
+또는 GitHub 연동:
+1. GitHub 저장소 푸시
+2. Vercel에서 프로젝트 임포트
+3. 환경 변수 설정
+4. 자동 배포
 
-### Environment Variables (Vercel)
-Set the following environment variable during deployment:
-- `NEXT_PUBLIC_API_URL`: Backend API URL
+### 환경 변수 (Vercel)
+- `NEXT_PUBLIC_API_URL`: 백엔드 API URL
 
-## Style Customization
+## 트러블슈팅
 
-### Tailwind Color Change
-Modify primary color in `tailwind.config.js`:
-
-```javascript
-theme: {
-  extend: {
-    colors: {
-      primary: {
-        // Change to desired color
-      },
-    },
-  },
-}
-```
-
-### Chat Bubble Style
-Modify class names in `ChatInterface.tsx`:
-
+### API 연결 실패
 ```typescript
-className={`max-w-2xl px-6 py-4 rounded-2xl ${
-  message.role === 'user'
-    ? 'bg-primary-500 text-white'
-    : 'bg-white border border-gray-200'
-}`}
-```
-
-## Responsive Design
-
-- Mobile: Vertical layout, adjusted button sizes
-- Tablet: Medium-sized layout
-- Desktop: Max width constraint (max-w-3xl)
-
-## Troubleshooting
-
-### API Connection Failed
-```typescript
-// Check baseURL in lib/api.ts
+// lib/api.ts에서 baseURL 확인
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 ```
 
-### CORS Error
-Check backend CORS settings:
+### CORS 오류
+백엔드 CORS 설정 확인:
 ```python
 # backend/app/config.py
-cors_origins: list[str] = [
-    "http://localhost:3000",
-    "https://your-domain.vercel.app",
-]
+cors_origins: str = "http://localhost:3000,https://your-domain.vercel.app"
 ```
 
-### Build Error
+### 빌드 오류
 ```bash
 rm -rf .next
 npm run build
-```
-
-## Development Guide
-
-### Add New Component
-```typescript
-// src/components/NewComponent.tsx
-'use client';
-
-import React from 'react';
-
-export default function NewComponent() {
-  return <div>New Component</div>;
-}
-```
-
-### Extend API Client
-```typescript
-// src/lib/api.ts
-async newApiMethod(): Promise<ResponseType> {
-  const response = await this.client.get<ResponseType>('/endpoint');
-  return response.data;
-}
 ```

@@ -12,8 +12,9 @@ from .services.rag_service import RAGService
 def get_embedding_service():
     """Get or create embedding service singleton."""
     return create_embedding_service(
-        model_type="sentence-transformers",
-        model_name=settings.embedding_model
+        api_key=settings.gemini_api_key,
+        model_name=settings.embedding_model,
+        dimension=settings.embedding_dimension
     )
 
 
@@ -32,7 +33,7 @@ def get_vector_store():
 @lru_cache()
 def get_query_rewriter():
     """Get or create query rewriter service singleton."""
-    return QueryRewriterService()
+    return QueryRewriterService(api_key=settings.gemini_api_key)
 
 
 @lru_cache()
