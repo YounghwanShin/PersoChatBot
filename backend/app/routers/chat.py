@@ -5,6 +5,7 @@ from typing import Dict
 from ..models.schemas import ChatRequest, ChatResponse, RetrievedChunk
 from ..services.rag_service import RAGService
 from ..dependencies import get_rag_service
+from ..config import settings
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -24,8 +25,8 @@ async def chat(
         result = rag_service.chat(
             query=request.message,
             conversation_history=conversation_history,
-            top_k=3,
-            score_threshold=0.3
+            top_k=settings.top_k_retrieval,
+            score_threshold=settings.similarity_threshold
         )
         
         retrieved_chunks = [
