@@ -39,7 +39,6 @@ wheels/
 # Project specific
 data/*.xlsx
 !data/Q&A_sample.csv
-vector_store/
 *.pkl
 *.log
 
