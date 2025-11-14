@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     
     # CORS Configuration
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        """Parse CORS origins from comma-separated string."""
+        return [origin.strip() for origin in self.cors_origins.split(",")]
     
     # Qdrant Configuration
     qdrant_host: str = "localhost"
@@ -50,8 +55,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-
-@property
-def cors_origins_list(self) -> list[str]:
-    """Parse CORS origins from comma-separated string."""
-    return [origin.strip() for origin in self.cors_origins.split(",")]
