@@ -15,6 +15,16 @@
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![Gemini](https://img.shields.io/badge/Gemini_API-8E75B2?logo=google&logoColor=white)](https://ai.google.dev/)
 
+<img src="image.png" alt="Chatbot Demo" width="800"/>
+
+<br/>
+
+<a href="https://perso-chat-bot.vercel.app">
+  <img src="https://img.shields.io/badge/🌐_Live_Demo-Visit_Site-4285F4?style=for-the-badge" alt="Live Demo"/>
+</a>
+
+<br/>
+
 </div>
 
 ## 프로젝트 개요
