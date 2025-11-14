@@ -52,17 +52,26 @@ uvicorn app.main:app --reload --port 8000
 
 ```
 app/
-├── main.py              # FastAPI 엔트리포인트
-├── config.py            # 설정 관리
-├── dependencies.py      # 의존성 주입
-├── models/
-│   └── schemas.py       # Pydantic 스키마
-├── routers/
-│   └── chat.py          # 채팅 API 라우터
+├── main.py                          # FastAPI 엔트리포인트
+├── core/                            # 핵심 레이어
+│   ├── config.py                    # 설정 관리
+│   ├── exceptions.py                # 커스텀 예외
+│   └── interfaces/                  # Protocol 기반 인터페이스
+├── infrastructure/                  # 인프라 레이어
+│   ├── embedding/                   # Gemini 임베딩 구현체
+│   ├── llm/                         # Gemini LLM 구현체
+│   ├── vector_store/                # Qdrant 구현체
+│   └── query_processor/             # 쿼리 재작성 구현체
+├── domain/                          # 도메인 레이어
+│   ├── models/
+│   │   └── schemas.py               # Pydantic 스키마
+│   └── services/
+│       └── rag_service.py           # RAG 비즈니스 로직
+├── application/                     # 응용 레이어
+│   └── dependencies.py              # 의존성 주입
+├── presentation/                    # 표현 레이어
+│   └── routers/
+│       └── chat.py                  # 채팅 API 라우터
 └── services/
-    ├── preprocessing.py # 데이터 전처리
-    ├── embedding.py     # 임베딩 서비스 (Gemini)
-    ├── vector_store.py  # Qdrant 벡터 저장소
-    ├── query_rewriter.py# 쿼리 재작성
-    └── rag_service.py   # RAG 통합 서비스
+    └── preprocessing.py             # 데이터 전처리 유틸리티
 ```

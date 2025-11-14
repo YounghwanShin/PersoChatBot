@@ -205,12 +205,12 @@ confidence = avg_similarity_score + relevance_boost
 ```
 ├── backend/
 │   ├── app/
-│   │   ├── services/
-│   │   │   ├── embedding.py         # Gemini 임베딩
-│   │   │   ├── vector_store.py      # Qdrant 관리
-│   │   │   ├── query_rewriter.py    # 쿼리 재작성
-│   │   │   ├── rag_service.py       # RAG 파이프라인
-│   │   │   └── preprocessing.py     # 데이터 전처리
+│   │   ├── core/                    # 핵심 레이어 (인터페이스, 설정)
+│   │   ├── infrastructure/          # 인프라 레이어 (Gemini, Qdrant 구현체)
+│   │   ├── domain/                  # 도메인 레이어 (비즈니스 로직)
+│   │   ├── application/             # 응용 레이어 (의존성 주입)
+│   │   ├── presentation/            # 표현 레이어 (API 라우터)
+│   │   ├── services/                # 유틸리티 서비스
 │   │   └── main.py
 │   └── scripts/
 │       └── preprocess_data.py       # 인덱싱 스크립트
