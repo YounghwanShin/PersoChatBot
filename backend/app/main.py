@@ -67,9 +67,9 @@ async def startup_event():
             print("Qdrant connection successful")
             info = vector_store.get_collection_info()
             if info:
-                print(f"Collection info: {info}")
+                print(f"Collection: {info.get('name')} | Points: {info.get('points_count')}")
         else:
-            print("Qdrant connection failed")
+            print("Warning: Qdrant connection failed")
     except Exception as e:
         print(f"Error connecting to Qdrant: {e}")
 

@@ -1,78 +1,76 @@
 # Perso.ai Chatbot - Backend
 
-FastAPI-based RAG (Retrieval-Augmented Generation) chatbot backend
+FastAPI 기반 RAG 챗봇 백엔드
 
-## Quick Start
+## 실행 방법
 
-### 1. Environment Setup
+### 1. 환경 설정
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# venv\Scripts\activate  # Windows
-
+source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Environment Variables
+### 2. 환경 변수
 
 ```bash
 cp .env.example .env
-# Edit .env and add GEMINI_API_KEY
+# .env 파일에서 GEMINI_API_KEY 설정
 ```
 
-### 3. Start Qdrant
+### 3. Qdrant 시작
 
 ```bash
 docker run -p 6333:6333 qdrant/qdrant
 ```
 
-### 4. Prepare Data
+### 4. 데이터 준비
 
-Place Q&A data file at `data/Q&A.xlsx`
+`data/Q&A.xlsx` 파일을 준비합니다.
 
-### 5. Preprocess and Index Data
+### 5. 데이터 전처리 및 인덱싱
 
 ```bash
 python scripts/preprocess_data.py
 ```
 
-### 6. Start Server
+### 6. 서버 시작
 
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-Server runs at http://localhost:8000
+서버는 http://localhost:8000 에서 실행됩니다.
 
-## API Documentation
+## API 문서
 
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
-## Architecture
+## 아키텍처
 
 ```
 app/
-├── main.py              # FastAPI app entry point
-├── config.py            # Configuration management
-├── dependencies.py      # Dependency injection
+├── main.py              # FastAPI 엔트리포인트
+├── config.py            # 설정 관리
+├── dependencies.py      # 의존성 주입
 ├── models/
-│   └── schemas.py       # Pydantic schemas
+│   └── schemas.py       # Pydantic 스키마
 ├── routers/
-│   └── chat.py          # Chat API router
+│   └── chat.py          # 채팅 API 라우터
 └── services/
-    ├── preprocessing.py # Data preprocessing
-    ├── embedding.py     # Embedding service
-    ├── vector_store.py  # Qdrant vector store
-    ├── query_rewriter.py# Query rewriting
-    └── rag_service.py   # RAG integration
+    ├── preprocessing.py # 데이터 전처리
+    ├── embedding.py     # 임베딩 서비스 (Gemini)
+    ├── vector_store.py  # Qdrant 벡터 저장소
+    ├── query_rewriter.py# 쿼리 재작성
+    └── rag_service.py   # RAG 통합 서비스
 ```
 
-## Key Endpoints
+## 주요 엔드포인트
 
 ### POST /api/v1/chat
-Generate answer for a question
+질문에 대한 답변 생성
 
 **Request:**
 ```json
@@ -92,66 +90,49 @@ Generate answer for a question
 ```
 
 ### GET /api/v1/health
-Check service status
+서비스 상태 확인
 
-## Module Description
+## 모듈 설명
 
 ### Embedding Service
-- Modular embedding system
-- Default: Sentence-Transformers
-- Easy to switch to other models (OpenAI, etc.)
+- Gemini API를 사용한 텍스트 임베딩
+- 모듈화된 설계로 다른 임베딩 모델로 교체 가능
 
 ### Vector Store Service
-- Qdrant vector database management
-- Document indexing and similarity search
-- Cosine similarity-based retrieval
+- Qdrant 벡터 데이터베이스 관리
+- 문서 인덱싱 및 유사도 검색
+- Cosine similarity 기반 검색
 
 ### Query Rewriter Service
-- User query optimization
-- Synonym expansion
-- Keyword extraction
+- Gemini API를 사용한 지능형 쿼리 재작성
+- 동의어 확장 및 검색 최적화
+- 빠른 응답을 위한 짧은 토큰 제한
 
 ### RAG Service
-- Complete RAG pipeline integration
-- Context retrieval
-- LLM response generation (Google Gemini)
+- 전체 RAG 파이프라인 통합
+- 컨텍스트 검색 및 LLM 응답 생성
 
-## Deployment
+## 배포
 
 ### Railway
-1. Push to GitHub repository
-2. Create Railway project
-3. Set environment variables
-4. Auto-deploy
+1. GitHub 저장소 푸시
+2. Railway 프로젝트 생성
+3. 환경 변수 설정
+4. 자동 배포
 
 ### Render
-1. Connect GitHub repository
-2. Create Web Service
+1. GitHub 저장소 연결
+2. Web Service 생성
 3. Build command: `pip install -r requirements.txt`
 4. Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 
-## Development Notes
+## 트러블슈팅
 
-### Code Style
-- Follow Google Python Style Guide
-- Use type hints
-- Include docstrings
-
-### Modularity Principles
-- Single Responsibility Principle (SRP)
-- Dependency Injection (DI)
-- Interface Segregation Principle (ISP)
-
-## Troubleshooting
-
-### Qdrant Connection Failed
+### Qdrant 연결 실패
 ```bash
 docker ps | grep qdrant
 docker restart <container_id>
 ```
 
-### Embedding Model Download Failed
-```bash
-echo $HF_HOME
-python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')"
-```
+### API 키 오류
+.env 파일에서 GEMINI_API_KEY가 올바르게 설정되었는지 확인

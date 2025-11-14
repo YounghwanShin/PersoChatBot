@@ -1,7 +1,7 @@
 """RAG (Retrieval-Augmented Generation) service."""
 
 from typing import List, Dict, Tuple
-import google.generativeai as genai
+from google import genai
 from .embedding import EmbeddingService
 from .vector_store import VectorStoreService
 from .query_rewriter import QueryRewriterService
@@ -16,7 +16,7 @@ class RAGService:
         vector_store: VectorStoreService,
         query_rewriter: QueryRewriterService,
         gemini_api_key: str,
-        model_name: str = "gemini-1.5-flash",
+        model_name: str = "gemini-2.0-flash-exp",
         temperature: float = 0.1,
         max_tokens: int = 512
     ):
@@ -24,8 +24,8 @@ class RAGService:
         self.vector_store = vector_store
         self.query_rewriter = query_rewriter
         
-        genai.configure(api_key=gemini_api_key)
-        self.model = genai.GenerativeModel(model_name)
+        self.client = genai.Client(api_key=gemini_api_key)
+        self.model_name = model_name
         self.temperature = temperature
         self.max_tokens = max_tokens
     
@@ -69,7 +69,7 @@ class RAGService:
         context: str,
         conversation_history: List[Dict] = None
     ) -> str:
-        """Generate response using LLM with retrieved context."""
+        """Generate response using Gemini API with retrieved context."""
         system_prompt = """You are an AI assistant that answers questions about Perso.ai.
 
 Important rules:
@@ -88,9 +88,10 @@ Please answer the question based on the above reference materials."""
         full_prompt = f"{system_prompt}\n\n{user_prompt}"
         
         try:
-            response = self.model.generate_content(
-                full_prompt,
-                generation_config=genai.GenerationConfig(
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=full_prompt,
+                config=genai.types.GenerateContentConfig(
                     temperature=self.temperature,
                     max_output_tokens=self.max_tokens,
                 )

@@ -1,72 +1,19 @@
-"""Query rewriting service for better retrieval."""
+"""Query rewriting service for better retrieval using Gemini API."""
 
-import re
-from typing import List
+from typing import Optional
+from google import genai
 
 
 class QueryRewriterService:
-    """Service for rewriting user queries for better retrieval."""
+    """Service for rewriting user queries for better retrieval using Gemini API."""
     
-    def __init__(self):
-        self.question_patterns = [
-            r"(.+?)이?가?\s*무엇",
-            r"(.+?)이?가?\s*뭐",
-            r"(.+?)(은|는)\s*어떻게",
-            r"(.+?)(은|는)\s*어디",
-            r"(.+?)(은|는)\s*누구",
-            r"(.+?)(을|를)\s*어떻게",
-        ]
-    
-    def expand_query(self, query: str) -> str:
-        """Expand query with synonyms and related terms."""
-        synonyms = {
-            "서비스": ["플랫폼", "솔루션", "프로그램"],
-            "기능": ["특징", "능력"],
-            "사용": ["이용", "활용"],
-            "가격": ["요금", "비용", "가격"],
-            "회원가입": ["가입", "등록"],
-        }
+    def __init__(self, api_key: Optional[str] = None):
+        """Initialize query rewriter with optional Gemini API key."""
+        self.api_key = api_key
+        self.client = None
         
-        expanded_terms = []
-        for word, related in synonyms.items():
-            if word in query:
-                expanded_terms.extend(related)
-        
-        if expanded_terms:
-            return f"{query} {' '.join(expanded_terms[:2])}"
-        
-        return query
-    
-    def extract_keywords(self, query: str) -> List[str]:
-        """Extract key terms from query."""
-        stop_words = [
-            "무엇", "뭐", "어떻게", "어디", "누구", "언제", "왜",
-            "인가요", "인지", "이에요", "예요", "가요",
-            "은", "는", "이", "가", "을", "를"
-        ]
-        
-        tokens = query.split()
-        keywords = [
-            token for token in tokens
-            if not any(stop in token for stop in stop_words)
-        ]
-        
-        return keywords
-    
-    def rewrite_as_statement(self, query: str) -> str:
-        """Convert question into a statement form."""
-        query = query.replace("?", "")
-        
-        conversions = {
-            r"(.+?)(은|는|이|가)\s*무엇인가요": r"\1",
-            r"(.+?)(을|를)\s*어떻게\s*(.+)": r"\1 \3",
-            r"(.+?)(은|는)\s*어디": r"\1 위치",
-        }
-        
-        for pattern, replacement in conversions.items():
-            query = re.sub(pattern, replacement, query)
-        
-        return query.strip()
+        if api_key:
+            self.client = genai.Client(api_key=api_key)
     
     def rewrite_query(
         self,
@@ -74,32 +21,38 @@ class QueryRewriterService:
         expand: bool = True,
         extract_keywords_only: bool = False
     ) -> str:
-        """Main query rewriting function."""
-        query = query.strip()
+        """Rewrite query using Gemini API for better retrieval."""
+        if not self.client:
+            return query.strip()
         
         if extract_keywords_only:
-            keywords = self.extract_keywords(query)
-            return " ".join(keywords)
+            prompt = f"""Extract only the most important keywords from this question for search. Remove question words and particles.
+
+Question: {query}
+
+Return only the keywords separated by spaces, nothing else."""
+        elif expand:
+            prompt = f"""Rewrite this question to be more search-friendly by expanding with synonyms and related terms. Keep it concise.
+
+Question: {query}
+
+Return only the rewritten query, nothing else."""
+        else:
+            return query.strip()
         
-        if expand:
-            query = self.expand_query(query)
-        
-        return query
-    
-    def generate_multiple_variants(self, query: str) -> List[str]:
-        """Generate multiple query variants for ensemble retrieval."""
-        variants = [
-            query,
-            self.rewrite_query(query, expand=True),
-            self.rewrite_query(query, extract_keywords_only=True),
-            self.rewrite_as_statement(query),
-        ]
-        
-        seen = set()
-        unique_variants = []
-        for variant in variants:
-            if variant not in seen:
-                seen.add(variant)
-                unique_variants.append(variant)
-        
-        return unique_variants
+        try:
+            response = self.client.models.generate_content(
+                model="gemini-2.0-flash-exp",
+                contents=prompt,
+                config=genai.types.GenerateContentConfig(
+                    temperature=0.3,
+                    max_output_tokens=100,
+                )
+            )
+            
+            rewritten = response.text.strip()
+            return rewritten if rewritten else query
+            
+        except Exception as e:
+            print(f"Query rewriting failed, using original: {e}")
+            return query.strip()

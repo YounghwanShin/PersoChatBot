@@ -13,7 +13,7 @@ from app.services.vector_store import VectorStoreService
 
 def main():
     """Main preprocessing and indexing function."""
-    print("=" * 60)
+    print("="  * 60)
     print("Perso.ai Chatbot - Data Preprocessing & Indexing")
     print("=" * 60)
     
@@ -26,7 +26,7 @@ def main():
         print(f"Created {len(chunks)} chunks from data")
         
         if not preprocessor.validate_chunks(chunks):
-            print("Chunk validation failed")
+            print("Error: Chunk validation failed")
             return
         print("Chunk validation passed")
         
@@ -38,8 +38,9 @@ def main():
     print("\n[Step 2] Initializing embedding service...")
     try:
         embedding_service = create_embedding_service(
-            model_type="sentence-transformers",
-            model_name=settings.embedding_model
+            api_key=settings.gemini_api_key,
+            model_name=settings.embedding_model,
+            dimension=settings.embedding_dimension
         )
         print(f"Loaded embedding model: {settings.embedding_model}")
         print(f"Embedding dimension: {embedding_service.get_dimension()}")
@@ -72,9 +73,8 @@ def main():
         )
         
         if not vector_store.health_check():
-            print("Cannot connect to Qdrant")
-            print("Make sure Qdrant is running:")
-            print("  docker run -p 6333:6333 qdrant/qdrant")
+            print("Error: Cannot connect to Qdrant")
+            print("Make sure Qdrant is running: docker run -p 6333:6333 qdrant/qdrant")
             return
         
         print(f"Connected to Qdrant at {settings.qdrant_host}:{settings.qdrant_port}")
@@ -113,7 +113,7 @@ def main():
             print(f"  Vectors: {info.get('vectors_count')}")
             print(f"  Status: {info.get('status')}")
         else:
-            print("Indexing failed")
+            print("Error: Indexing failed")
             return
             
     except Exception as e:

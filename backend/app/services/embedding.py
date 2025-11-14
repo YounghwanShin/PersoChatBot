@@ -1,9 +1,10 @@
-"""Embedding service with pluggable architecture."""
+"""Embedding service using Google Gemini API."""
 
 from abc import ABC, abstractmethod
 from typing import List
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from google import genai
+from google.genai import types
 
 
 class EmbeddingModel(ABC):
@@ -20,39 +21,27 @@ class EmbeddingModel(ABC):
         pass
 
 
-class SentenceTransformerEmbedding(EmbeddingModel):
-    """Sentence-Transformers based embedding model."""
+class GeminiEmbedding(EmbeddingModel):
+    """Gemini API-based embedding model."""
     
-    def __init__(self, model_name: str):
+    def __init__(self, api_key: str, model_name: str = "gemini-embedding-001", dimension: int = 768):
+        self.client = genai.Client(api_key=api_key)
         self.model_name = model_name
-        self.model = SentenceTransformer(model_name)
-        self._dimension = self.model.get_sentence_embedding_dimension()
+        self._dimension = dimension
     
     def encode(self, texts: List[str]) -> np.ndarray:
-        """Encode texts using Sentence-Transformers."""
-        embeddings = self.model.encode(
-            texts,
-            show_progress_bar=False,
-            convert_to_numpy=True
+        """Encode texts using Gemini API."""
+        result = self.client.models.embed_content(
+            model=self.model_name,
+            contents=texts,
+            config=types.EmbedContentConfig(
+                task_type="RETRIEVAL_DOCUMENT",
+                output_dimensionality=self._dimension
+            )
         )
+        
+        embeddings = np.array([np.array(e.values) for e in result.embeddings])
         return embeddings
-    
-    def get_dimension(self) -> int:
-        """Get embedding dimension."""
-        return self._dimension
-
-
-class OpenAIEmbedding(EmbeddingModel):
-    """OpenAI embedding model (placeholder for future implementation)."""
-    
-    def __init__(self, api_key: str, model_name: str = "text-embedding-ada-002"):
-        self.api_key = api_key
-        self.model_name = model_name
-        self._dimension = 1536
-    
-    def encode(self, texts: List[str]) -> np.ndarray:
-        """Encode texts using OpenAI API."""
-        raise NotImplementedError("OpenAI embedding not implemented yet")
     
     def get_dimension(self) -> int:
         """Get embedding dimension."""
@@ -79,19 +68,10 @@ class EmbeddingService:
 
 
 def create_embedding_service(
-    model_type: str = "sentence-transformers",
-    model_name: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-    **kwargs
+    api_key: str,
+    model_name: str = "gemini-embedding-001",
+    dimension: int = 768
 ) -> EmbeddingService:
     """Factory function to create embedding service."""
-    if model_type == "sentence-transformers":
-        model = SentenceTransformerEmbedding(model_name)
-    elif model_type == "openai":
-        api_key = kwargs.get("api_key")
-        if not api_key:
-            raise ValueError("OpenAI API key required")
-        model = OpenAIEmbedding(api_key, model_name)
-    else:
-        raise ValueError(f"Unknown model type: {model_type}")
-    
+    model = GeminiEmbedding(api_key=api_key, model_name=model_name, dimension=dimension)
     return EmbeddingService(model)
