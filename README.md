@@ -1,6 +1,21 @@
-# Perso.ai 지식기반 챗봇
+<div align="center">
 
-Vector DB 기반 RAG 시스템을 활용한 Q&A 챗봇
+# 🤖 Perso.ai 지식기반 챗봇
+
+<p align="center">
+  <strong>Vector DB 기반 RAG 시스템을 활용한 지능형 Q&A 챗봇</strong>
+</p>
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Qdrant](https://img.shields.io/badge/Qdrant-DC244C?logo=qdrant&logoColor=white)](https://qdrant.tech/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Gemini](https://img.shields.io/badge/Gemini_API-8E75B2?logo=google&logoColor=white)](https://ai.google.dev/)
+
+</div>
 
 ## 프로젝트 개요
 
