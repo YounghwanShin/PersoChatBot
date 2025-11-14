@@ -1,7 +1,15 @@
 """Pydantic models for request/response validation."""
 
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
+
+
+class Document(BaseModel):
+    """Document model for vector store operations."""
+    id: str = Field(..., description="Unique document identifier")
+    content: str = Field(..., description="Document content")
+    metadata: dict = Field(default={}, description="Document metadata")
+    embedding: Optional[List[float]] = Field(default=None, description="Document embedding vector")
 
 
 class ChatMessage(BaseModel):

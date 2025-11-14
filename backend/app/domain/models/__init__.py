@@ -1,6 +1,7 @@
 """Domain models module."""
 
 from .schemas import (
+    Document,
     ChatMessage,
     ChatRequest,
     ChatResponse,
@@ -9,6 +10,7 @@ from .schemas import (
 )
 
 __all__ = [
+    "Document",
     "ChatMessage",
     "ChatRequest",
     "ChatResponse",

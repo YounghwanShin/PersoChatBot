@@ -181,7 +181,10 @@ Please answer the question based on the above reference materials."""
                 {
                     "content": chunk["answer"],
                     "score": chunk["score"],
-                    "metadata": chunk["metadata"]
+                    "metadata": {
+                        "question": chunk.get("question", ""),
+                        "category": chunk.get("category", "")
+                    }
                 }
                 for chunk in retrieved_chunks
             ],
