@@ -1,4 +1,4 @@
-"""Root layout for the application."""
+// Root layout for the application.
 
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';

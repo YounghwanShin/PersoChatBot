@@ -1,4 +1,4 @@
-"""API client for communicating with the backend."""
+// API client for communicating with the backend.
 
 import axios, { AxiosInstance } from 'axios';
 

@@ -1,4 +1,4 @@
-"""Main page for the Perso.ai chatbot."""
+// Main page for the Perso.ai chatbot.
 
 import ChatInterface from '@/components/ChatInterface';
 
