@@ -17,9 +17,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    environment:
-      - QDRANT_HOST=qdrant
-      - QDRANT_PORT=6333
     env_file:
       - ./backend/.env
     depends_on:
