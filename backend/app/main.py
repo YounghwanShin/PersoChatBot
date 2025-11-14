@@ -2,10 +2,11 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .config import settings
-from .routers import chat
-from .models.schemas import HealthResponse
-from .dependencies import get_vector_store
+
+from .core.config import settings
+from .domain.models import HealthResponse
+from .application.dependencies import get_vector_store
+from .presentation.routers import chat_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -21,12 +22,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(chat.router, prefix=settings.api_prefix)
+app.include_router(chat_router, prefix=settings.api_prefix)
 
 
 @app.get("/")
 async def root():
-    """Root endpoint."""
+    """Root endpoint.
+
+    Returns:
+        Application information
+    """
     return {
         "name": settings.app_name,
         "version": settings.app_version,
@@ -36,11 +41,15 @@ async def root():
 
 @app.get(f"{settings.api_prefix}/health", response_model=HealthResponse)
 async def health_check():
-    """Health check endpoint."""
+    """Health check endpoint.
+
+    Returns:
+        Health status response
+    """
     try:
         vector_store = get_vector_store()
         qdrant_connected = vector_store.health_check()
-        
+
         return HealthResponse(
             status="healthy" if qdrant_connected else "degraded",
             version=settings.app_version,
