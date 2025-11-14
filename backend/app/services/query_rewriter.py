@@ -42,7 +42,7 @@ Return only the rewritten query, nothing else."""
         
         try:
             response = self.client.models.generate_content(
-                model="gemini-2.0-flash-exp",
+                model="gemini-2.0-flash",
                 contents=prompt,
                 config=genai.types.GenerateContentConfig(
                     temperature=0.3,
