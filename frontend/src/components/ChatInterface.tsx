@@ -3,13 +3,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
 import { apiClient, ChatMessage } from '@/lib/api';
+import { Message, createMessage, getErrorMessage } from '@/lib/messageUtils';
+import { SAMPLE_QUESTIONS, MAX_CONVERSATION_HISTORY, ERROR_MESSAGES } from '@/lib/constants';
 import ReactMarkdown from 'react-markdown';
-
-interface Message extends ChatMessage {
-  id: string;
-  timestamp: Date;
-  confidence?: number;
-}
 
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -26,12 +22,7 @@ export default function ChatInterface() {
 
     if (!inputMessage.trim() || isLoading) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: inputMessage,
-      timestamp: new Date(),
-    };
+    const userMessage = createMessage('user', inputMessage);
 
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
@@ -39,7 +30,7 @@ export default function ChatInterface() {
 
     try {
       const conversationHistory: ChatMessage[] = messages
-        .slice(-5)
+        .slice(-MAX_CONVERSATION_HISTORY)
         .map(msg => ({ role: msg.role, content: msg.content }));
 
       const response = await apiClient.sendMessage(
@@ -47,25 +38,19 @@ export default function ChatInterface() {
         conversationHistory
       );
 
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response.answer,
-        timestamp: new Date(),
-        confidence: response.confidence,
-      };
+      const assistantMessage = createMessage(
+        'assistant',
+        response.answer,
+        response.confidence
+      );
 
       setMessages(prev => [...prev, assistantMessage]);
 
     } catch (error) {
       console.error('Error:', error);
 
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: '죄송합니다. 응답을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.',
-        timestamp: new Date(),
-      };
+      const errorContent = getErrorMessage(error);
+      const errorMessage = createMessage('assistant', errorContent);
 
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -76,15 +61,6 @@ export default function ChatInterface() {
   const handleQuestionClick = (question: string) => {
     setInputMessage(question);
   };
-
-  const sampleQuestions = [
-    'Perso.ai는 어떤 서비스인가요?',
-    'Perso.ai의 주요 기능은 무엇인가요?',
-    'Perso.ai는 어떤 기술을 사용하나요?',
-    'Perso.ai의 사용자는 어느 정도인가요?',
-    'Perso.ai에서 지원하는 언어는 몇 개인가요?',
-    'Perso.ai의 요금제는 어떻게 구성되어 있나요?'
-  ];
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -128,7 +104,7 @@ export default function ChatInterface() {
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-3xl mx-auto">
-                {sampleQuestions.map((question, idx) => (
+                {SAMPLE_QUESTIONS.map((question, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleQuestionClick(question)}
@@ -205,7 +181,7 @@ export default function ChatInterface() {
               <div className="bg-white/90 backdrop-blur border border-gray-200 px-5 py-4 rounded-2xl shadow-md">
                 <div className="flex items-center gap-2">
                   <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
-                  <span className="text-sm text-gray-600">답변을 생성하고 있습니다...</span>
+                  <span className="text-sm text-gray-600">{ERROR_MESSAGES.LOADING}</span>
                 </div>
               </div>
             </div>
