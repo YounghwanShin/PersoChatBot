@@ -1,4 +1,5 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosError } from 'axios';
+import { retryWithBackoff, DEFAULT_RETRY_CONFIG } from './retry';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -28,12 +29,42 @@ export interface HealthResponse {
   qdrant_connected: boolean;
 }
 
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public statusCode?: number,
+    public originalError?: any
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+function getErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response) {
+      return `Server error: ${axiosError.response.status}`;
+    } else if (axiosError.request) {
+      return 'No response from server. Please check your connection.';
+    }
+  }
+  return 'An unexpected error occurred.';
+}
+
+function getStatusCode(error: unknown): number | undefined {
+  if (axios.isAxiosError(error)) {
+    return (error as AxiosError).response?.status;
+  }
+  return undefined;
+}
+
 class ApiClient {
   private client: AxiosInstance;
 
   constructor() {
     const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
-    
+
     this.client = axios.create({
       baseURL,
       headers: {
@@ -48,15 +79,22 @@ class ApiClient {
     conversationHistory: ChatMessage[] = []
   ): Promise<ChatResponse> {
     try {
-      const response = await this.client.post<ChatResponse>('/chat/', {
-        message,
-        conversation_history: conversationHistory,
-      });
-      
+      const response = await retryWithBackoff(
+        () => this.client.post<ChatResponse>('/chat/', {
+          message,
+          conversation_history: conversationHistory,
+        }),
+        DEFAULT_RETRY_CONFIG
+      );
+
       return response.data;
     } catch (error) {
-      console.error('Error sending message:', error);
-      throw new Error('Failed to send message. Please try again.');
+      console.error('Failed to send message:', error);
+      throw new ApiError(
+        getErrorMessage(error),
+        getStatusCode(error),
+        error
+      );
     }
   }
 
@@ -65,8 +103,12 @@ class ApiClient {
       const response = await this.client.get<HealthResponse>('/health');
       return response.data;
     } catch (error) {
-      console.error('Error checking health:', error);
-      throw new Error('Failed to check backend health.');
+      console.error('Failed to check health:', error);
+      throw new ApiError(
+        getErrorMessage(error),
+        getStatusCode(error),
+        error
+      );
     }
   }
 }
