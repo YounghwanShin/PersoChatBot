@@ -216,10 +216,16 @@ confidence = avg_similarity_score + relevance_boost
 │       └── preprocess_data.py       # 인덱싱 스크립트
 ├── frontend/
 │   └── src/
+│       ├── app/
+│       │   ├── layout.tsx           # 루트 레이아웃
+│       │   └── page.tsx             # 메인 페이지
 │       ├── components/
-│       │   └── ChatInterface.tsx    # 채팅 UI
+│       │   └── ChatInterface.tsx    # 채팅 UI 컴포넌트
 │       └── lib/
-│           └── api.ts               # API 클라이언트
+│           ├── api.ts               # API 클라이언트
+│           ├── retry.ts             # 재시도 로직
+│           ├── messageUtils.ts      # 메시지 유틸리티
+│           └── constants.ts         # 상수 정의
 └── docker-compose.yml
 ```
 

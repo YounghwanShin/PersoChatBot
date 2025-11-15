@@ -33,7 +33,11 @@ src/
 │   ├── layout.tsx         # 루트 레이아웃
 │   └── globals.css        # 전역 스타일
 ├── components/
-│   └── ChatInterface.tsx  # 채팅 인터페이스
+│   └── ChatInterface.tsx  # 채팅 인터페이스 컴포넌트
 └── lib/
-    └── api.ts             # API 클라이언트
+    ├── api.ts             # API 클라이언트 (재시도 로직 포함)
+    ├── retry.ts           # Exponential backoff 재시도 유틸리티
+    ├── messageUtils.ts    # 메시지 생성 및 에러 처리 유틸리티
+    └── constants.ts       # 애플리케이션 상수
 ```
+
